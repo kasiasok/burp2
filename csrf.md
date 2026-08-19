@@ -9,7 +9,7 @@ Serwer sprawdza, czy nagłówek Referer (lub lepiej: Origin, bo jest bardziej ni
 <br>
 LAX: <br>
 Żądanie jest metodą GET <br>
-Jest to top-level navigation — czyli użytkownik faktycznie zmienia adres w pasku przeglądarki (klika link, wpisuje URL, przechodzi przez <a href>, przekierowanie).
+Jest to top-level navigation — czyli użytkownik faktycznie zmienia adres w pasku przeglądarki (klika link, wpisuje URL, przechodzi przez a href, przekierowanie).
 
 <br>
 formularze POC CSRF ida przez POST. 
