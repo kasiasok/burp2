@@ -4,7 +4,7 @@ TESTOWY EMAIL
 3. get + usunac csrf + csrfpoc: head ``` <meta name="referrer" content="no-referrer"> ```(poc csrf in browser) <br> 
 
 DOCELOWY EMAIL
-wkleic dzialajacy csrf poc w EXPLOIT BODY i deliver to the victim!!!
+wkleic dzialajacy w csrf poc w EXPLOIT BODY i deliver to the victim!!!
 
 
 
