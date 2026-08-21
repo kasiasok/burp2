@@ -76,3 +76,27 @@ Dlatego klasyczny CSRF prawie zawsze wykorzystuje <form>, a nie fetch() — to w
 Znajduje session=xyz, dokleja nagłówek Cookie: session=xyz do żądania.
 8. Dopiero teraz żądanie faktycznie leci przez sieć — bezpośrednio do bank.pl, nigdy przez serwer atakującego.
 9. Bank odpowiada bezpośrednio przeglądarce ofiary, a przelew leci do atakującego.
+
+<br>
+
+RReferer jako walidacja — potwierdzenie
+
+Tak: serwer banku sprawdza Referer, żeby zweryfikować, że żądanie rzeczywiście przyszło z jego własnej domeny (bank.pl/przelew.html), a nie z obcej strony (exploit-server.net/quiz.html). Jeśli serwer widzi Referer wskazujący na exploit-server.net, powinien odrzucić żądanie — to jest cała logika tej obrony.
+
+
+<br>
+
+Podsumowanie poprawnej zależności:
+
+Co robisz w PoC	Co to omija
+
+<meta name="referrer" content="no-referrer">	Walidację Referer (jeśli serwer akceptuje puste)
+Formularz html zamiast fetch/img (który i tak nie ma znaczenia dla CSRF)
+GET zamiast POST + auto-submit JS	Nic nie omija samo z siebie — kluczowe jest czy request jest subresource czy top-level navigation, co decyduje o SameSite=Lax
+
+
+<br>
+
+a dlaczego nie mozna podmienic referefa w poc na wlasciwy zamiast pusty?
+
+Bo Referer to nagłówek generowany i kontrolowany wyłącznie przez przeglądarkę, nie przez JavaScript ani przez atakującego. Nie masz do niego zapisu z poziomu strony WWW — to fundamentalne ograniczenie API przeglądarek, nie przypadkowa luka.
