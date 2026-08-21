@@ -63,3 +63,16 @@ fetch()/XMLHttpRequest do innej domeny (cross-origin) podlega CORS — przegląd
 Formularz HTML nie podlega CORS w ogóle — to fundamentalna różnica. Przeglądarki od zawsze pozwalają na cross-site form submission (to legalna, stara funkcja webu), więc atakujący nie musi znać ani odczytywać odpowiedzi banku — wystarczy że żądanie dotrze i zostanie wykonane.
 
 Dlatego klasyczny CSRF prawie zawsze wykorzystuje <form>, a nie fetch() — to właśnie dlatego Twój oryginalny kod z pierwszej wiadomości był poprawnie skonstruowany.
+
+<br>
+
+1. Atakujący hostuje CSRF PoC (HTML) na SWOIM serwerze (exploit server)
+2. Ofiara odwiedza stronę atakującego → pobiera ten HTML do SWOJEJ przeglądarki
+3. Przeglądarka ofiary WYKONUJE ten HTML lokalnie (auto-submit formularza)
+4. Przeglądarka ofiary ma w swoim lokalnym magazynie ciasteczek wpis: domena bank.pl → session=xyz (bo ofiara zalogowała się tam wcześniej).
+5. Kod HTML z serwera atakującego zawiera formularz z action="https://bank.pl/przelew".
+6. Kiedy JavaScript wywołuje form.submit(), przeglądarka przygotowuje żądanie HTTP do bank.pl.
+7. Zanim wyśle to żądanie, przeglądarka automatycznie sprawdza: "czy mam jakieś ciasteczka zapisane dla domeny bank.pl?" — to jest wbudowana, twarda reguła przeglądarki, działająca dla każdego żądania do dowolnej domeny, niezależnie skąd request pochodzi.
+Znajduje session=xyz, dokleja nagłówek Cookie: session=xyz do żądania.
+8. Dopiero teraz żądanie faktycznie leci przez sieć — bezpośrednio do bank.pl, nigdy przez serwer atakującego.
+9. Bank odpowiada bezpośrednio przeglądarce ofiary, a przelew leci do atakującego.
